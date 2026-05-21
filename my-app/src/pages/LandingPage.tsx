@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 
 type AuthMode = "login" | "register";
 
@@ -15,6 +16,7 @@ export default function LandingPage() {
   const [form, setForm] = useState<AuthForm>({ email: "", password: "", confirmPassword: "" });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -67,7 +69,7 @@ export default function LandingPage() {
 
       // Store token and redirect (replace with your router navigation)
       localStorage.setItem("token", data.token);
-      alert(`${mode === "login" ? "Logged in" : "Registered"} successfully! Token stored.`);
+      navigate('/dashboard');
     } catch {
       setError("Unable to reach the server. Make sure your backend is running.");
     } finally {
