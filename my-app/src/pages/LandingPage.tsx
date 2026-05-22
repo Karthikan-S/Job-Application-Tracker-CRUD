@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 type AuthMode = "login" | "register";
 
@@ -69,7 +70,8 @@ export default function LandingPage() {
 
       // Store token and redirect (replace with your router navigation)
       localStorage.setItem("token", data.token);
-      navigate('/dashboard');
+      const decoded = jwtDecode<{ role: string }>(data.token);
+      navigate(decoded.role === 'admin' ? '/admin' : '/dashboard');
     } catch {
       setError("Unable to reach the server. Make sure your backend is running.");
     } finally {

@@ -11,9 +11,9 @@ const JWT_EXPIRES_IN =
   (process.env.JWT_EXPIRES_IN || "7d") as jwt.SignOptions["expiresIn"];
 
 // Helper to generate JWT
-const generateToken = (id: string, email: string) => {
+const generateToken = (id: string, email: string, role: string) => {
   return jwt.sign(
-    { id, email },
+    { id, email, role },
     JWT_SECRET,
     {expiresIn: JWT_EXPIRES_IN,}
   );
@@ -44,14 +44,13 @@ router.post('/register', async (req: Request, res: Response) => {
 
     // Insert user
     const result = await pool.query(
-      'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email, created_at',
+      'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email, role, created_at',
       [email, hashedPassword]
     );
-
     const user = result.rows[0];
-    const token = generateToken(user.id, user.email);
+    const token = generateToken(user.id, user.email, user.role);
 
-    return res.status(201).json({ token, user: { id: user.id, email: user.email } });
+    return res.status(201).json({ token, user: { id: user.id, email: user.email, role: user.role } });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: 'Server error' });
@@ -81,9 +80,8 @@ router.post('/login', async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const token = generateToken(user.id, user.email);
-
-    return res.status(200).json({ token, user: { id: user.id, email: user.email } });
+    const token = generateToken(user.id, user.email, user.role);
+    return res.status(200).json({ token, user: { id: user.id, email: user.email, role: user.role } });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: 'Server error' });

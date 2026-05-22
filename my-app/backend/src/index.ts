@@ -5,6 +5,7 @@ dotenv.config({ path: path.resolve(__dirname, '../environment.env') });
 import express from 'express';
 import cors from 'cors';
 import authRoutes from './routes/auth';
+import adminRoutes from './routes/admin';
 
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/api/health', (_, res) => res.json({ status: 'ok' }));
